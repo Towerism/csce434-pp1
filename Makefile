@@ -8,17 +8,17 @@
 # Set the default target. When you make with no arguments,
 # this will be the target built.
 COMPILER = dcc
-PREPROCESSOR = dpp
+PREPROCESSOR =
 PRODUCTS = $(COMPILER) $(PREPROCESSOR)
 default: $(PRODUCTS)
 
 # Set up the list of source and object files
-SRCS = errors.cc utility.cc main.cc  
+SRCS = errors.cc utility.cc main.cc
 
 # OBJS can deal with either .cc or .c files listed in SRCS
 OBJS = lex.yy.o $(patsubst %.cc, %.o, $(filter %.cc,$(SRCS))) $(patsubst %.c, %.o, $(filter %.c, $(SRCS)))
 
-JUNK =  *.o lex.yy.c dpp.yy.c y.tab.c y.tab.h *.core core $(COMPILER).purify purify.log 
+JUNK =  *.o lex.yy.c dpp.yy.c y.tab.c y.tab.h *.core core $(COMPILER).purify purify.log
 
 # Define the tools we are going to use
 CC= g++
@@ -31,7 +31,7 @@ YACC = bison
 # We want debugging and most warnings, but lex/yacc generate some
 # static symbols we don't use, so turn off unused warnings to avoid clutter
 # STL has some signed/unsigned comparisons we want to suppress
-CFLAGS = -g  -Wall -Wno-unused -Wno-sign-compare 
+CFLAGS = -std=c++14 -g  -Wall -Wno-unused -Wno-sign-compare
 
 # The -d flag tells lex to set up for debugging. Can turn on/off by
 # setting value of global yy_flex_debug inside the scanner itself
@@ -51,7 +51,7 @@ LIBS = -lc -lm
 .yy.o: $*.yy.c
 	$(CC) $(CFLAGS) -c -o $@ $*.cc
 
-lex.yy.c: scanner.l 
+lex.yy.c: scanner.l
 	$(LEX) $(LEXFLAGS) scanner.l
 
 .cc.o: $*.cc
@@ -86,8 +86,13 @@ strip : $(PRODUCTS)
 # file to the project or move the project between machines
 #
 depend:
-	makedepend -- $(CFLAGS) -- $(SRCS)
+	makedepend -Y -- $(CFLAGS) -Y -- $(SRCS)
 
 clean:
 	rm -f $(JUNK) y.output $(PRODUCTS)
 
+# DO NOT DELETE
+
+errors.o: errors.h location.h
+utility.o: utility.h list.h
+main.o: utility.h errors.h location.h scanner.h
