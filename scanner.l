@@ -35,17 +35,17 @@
    */
   struct yyltype yylloc; // manually dclared for pp1, later Yacc provides
 
-    /* Macro: YY_USER_ACTION 
-     * ---------------------
-     * This flex built-in macro can be defined to provide an action which is
-     * always executed prior to any matched rule's action. Basically, it is
-     * a way of having a piece of code common to all actions factored out to
-     * this routine.	We already defined it for you and left the empty
-     * function DoBeforeEachAction ready for your use as needed. It will
-     * be called once for each pattern scanned from the file, before
-     * executing its action.
-     */
-    static void DoBeforeEachAction(); 
+  /* Macro: YY_USER_ACTION 
+   * ---------------------
+   * This flex built-in macro can be defined to provide an action which is
+   * always executed prior to any matched rule's action. Basically, it is
+   * a way of having a piece of code common to all actions factored out to
+   * this routine.	We already defined it for you and left the empty
+   * function DoBeforeEachAction ready for your use as needed. It will
+   * be called once for each pattern scanned from the file, before
+   * executing its action.
+   */
+  static void DoBeforeEachAction(); 
 #define YY_USER_ACTION DoBeforeEachAction();
 
 %}
@@ -59,17 +59,38 @@
 */
 %option noyywrap
 
-ALPHA [a-zA-Z]
-DIGIT [0-9]
-ALPHANUM {ALPHA}|{DIGIT}
-IDENTIFIER {ALPHA}[{ALPHANUM}_]*
+SPACE [ ]
+TAB \t
+ENDL \n
+IDENTIFIER [:alpha:][[:alnum:]_]*
 
 %%						 /* BEGIN RULES SECTION */
  /* All patterns and actions should be placed between the start and stop
   * %% markers which delimit the Rules section. 
   */ 
 
-{IDENTIFIER}+ { yylval.stringConstant = strdup(yytext); return T_StringConstant; }
+{SPACE} {
+  ++yylloc.last_column;
+}
+
+\t+ {}
+
+{ENDL} {
+  ++yylloc.first_line;
+  yylloc.first_column = yylloc.last_column = 1;
+}
+
+{IDENTIFIER}+ {
+  std::string lexeme(yytext);
+  if (lexeme.length() > MaxIdentLen) {
+    ReportError::LongIdentifier(&yylloc, yytext);
+  }
+  strncpy(yylval.identifier, yytext, MaxIdentLen);
+  yylval.identifier[MaxIdentLen] = '\0';
+  return T_Identifier;
+}
+
+. {}
 
 %%
  /* The closing %% above marks the end of the Rules section and the beginning
@@ -94,6 +115,7 @@ IDENTIFIER {ALPHA}[{ALPHANUM}_]*
 void InitScanner()
 {
   PrintDebug("lex", "Initializing scanner");
+  yylloc.first_line = yylloc.first_column = yylloc.last_column = 1;
   yy_flex_debug = false;
 }
 
@@ -105,4 +127,7 @@ void InitScanner()
  */
 static void DoBeforeEachAction()
 {
+  std::string lexeme(yytext);
+  yylloc.first_column = yylloc.last_column;
+  yylloc.last_column = yylloc.first_column + lexeme.length();
 }
