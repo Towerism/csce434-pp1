@@ -6,4 +6,6 @@
  * here, otherwise the file can remain empty.
  */
 
+%option noyywrap
+
 %%
