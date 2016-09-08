@@ -13,6 +13,7 @@
    */
 
 #include <string.h>
+#include <string>
 #include "scanner.h"
 #include "utility.h" // for PrintDebug()
 #include "errors.h"
@@ -58,17 +59,17 @@
 */
 %option noyywrap
 
- /* The section before the first %% is the Definitions section of the lex
-  * input file. Here is where you set options for the scanner, define lex
-  * states, and can set up definitions to give names to regular expressions
-  * as a simple substitution mechanism that allows for more readable
-  * entries in the Rules section later. 
-  */
+ALPHA [a-zA-Z]
+DIGIT [0-9]
+ALPHANUM {ALPHA}|{DIGIT}
+IDENTIFIER {ALPHA}[{ALPHANUM}_]*
 
 %%						 /* BEGIN RULES SECTION */
  /* All patterns and actions should be placed between the start and stop
   * %% markers which delimit the Rules section. 
   */ 
+
+{IDENTIFIER}+ { yylval.stringConstant = strdup(yytext); return T_StringConstant; }
 
 %%
  /* The closing %% above marks the end of the Rules section and the beginning
