@@ -91,8 +91,14 @@ depend:
 clean:
 	rm -f $(JUNK) y.output $(PRODUCTS)
 
+.PHONY: test
+
+test: $(COMPILER)
+	./test.sh
+
 # DO NOT DELETE
 
 errors.o: errors.h location.h
 utility.o: utility.h list.h
 main.o: utility.h errors.h location.h scanner.h
+
