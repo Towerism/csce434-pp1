@@ -64,7 +64,13 @@ SPACE_TAB [ \t]
 ENDL \n
 IDENTIFIER [:alpha:][[:alnum:]_]*
 DIGIT [0-9]
-INTEGER {DIGIT}+
+
+HEX_ALPHA [a-fA-F]
+HEX_SUFFIX_CHAR {DIGIT}|{HEX_ALPHA}
+HEX_SUFFIX {HEX_SUFFIX_CHAR}+
+HEXADECIMAL 0[xX]{HEX_SUFFIX}
+
+DECIMAL {DIGIT}+
 
 TRUE "true"
 FALSE "false"
@@ -110,7 +116,12 @@ OR "||"
   return T_Bool;
 }
 
-{INTEGER} {
+{HEXADECIMAL} {
+  yylval.integerConstant = std::stoi(yytext, nullptr, 16);
+  return T_IntConstant;
+}
+
+{DECIMAL} {
   yylval.integerConstant = std::stoi(yytext);
   return T_IntConstant;
 }
@@ -150,7 +161,7 @@ void InitScanner()
 {
   PrintDebug("lex", "Initializing scanner");
   yylloc.first_line = yylloc.first_column = yylloc.last_column = 1;
-  yy_flex_debug = true;
+  yy_flex_debug = false;
 }
 
 
