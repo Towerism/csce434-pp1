@@ -65,6 +65,10 @@ ENDL \n
 IDENTIFIER [:alpha:][[:alnum:]_]*
 DIGIT [0-9]
 
+NOT_STRING_END [^\"\n]
+STRING \"{NOT_STRING_END}*\"
+UNTERMINATED_STRING \"{NOT_STRING_END}*
+
 HEX_ALPHA [a-fA-F]
 HEX_SUFFIX_CHAR {DIGIT}|{HEX_ALPHA}
 HEX_SUFFIX {HEX_SUFFIX_CHAR}+
@@ -110,6 +114,13 @@ OR "||"
   return T_Identifier;
 }
 
+{UNTERMINATED_STRING} ReportError::UntermString(&yylloc, yytext);
+
+{STRING} {
+  yylval.stringConstant = yytext;
+  return T_StringConstant;
+}
+
 {TRUE} {
   yylval.boolConstant = true;
   return T_Bool;
@@ -144,7 +155,7 @@ OR "||"
 
 {PUNCTUATION_1} return yytext[0];
 
-. {}
+. ReportError::UnrecogChar(&yylloc, yytext[0]);
 
 %%
  /* The closing %% above marks the end of the Rules section and the beginning
