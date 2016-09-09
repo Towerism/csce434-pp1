@@ -1,6 +1,5 @@
 #!/bin/env sh
 
-SAMPLEFOLDER=samples
 SAMPLEIN=$(find . -name '*.frag' -o \( -name '*.decaf' \))
 
 for SAMPLE in $SAMPLEIN; do
