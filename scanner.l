@@ -83,8 +83,15 @@ KEY_BREAK "break"
 KEY_NEW "New"
 KEY_NEW_ARRAY "NewArray"
 
-IDENTIFIER [:alpha:][[:alnum:]_]*
+LOWER [a-z]
+UPPER [A-Z]
+ALPHA {LOWER}|{UPPER}
 DIGIT [0-9]
+ALPHA_NUM {ALPHA}|{DIGIT}
+
+IDENTIFIER_HEAD {ALPHA}
+IDENTIFIER_TAIL ({ALPHA_NUM}|_)*
+IDENTIFIER {IDENTIFIER_HEAD}{IDENTIFIER_TAIL}
 
 NOT_STRING_END [^\"\n]
 STRING \"{NOT_STRING_END}*\"
@@ -145,6 +152,15 @@ OR "||"
 {KEY_NEW} return T_New;
 {KEY_NEW_ARRAY} return T_NewArray;
 
+{TRUE} {
+  yylval.boolConstant = true;
+  return T_Bool;
+}
+
+{FALSE} {
+  yylval.boolConstant = false;
+  return T_Bool;
+}
 
 {IDENTIFIER} {
   std::string lexeme(yytext);
@@ -161,16 +177,6 @@ OR "||"
 {STRING} {
   yylval.stringConstant = yytext;
   return T_StringConstant;
-}
-
-{TRUE} {
-  yylval.boolConstant = true;
-  return T_Bool;
-}
-
-{FALSE} {
-  yylval.boolConstant = false;
-  return T_Bool;
 }
 
 {HEXADECIMAL} {
@@ -235,7 +241,7 @@ void InitScanner()
 static void DoBeforeEachAction()
 {
   std::string lexeme(yytext);
-  yylloc.first_column = yylloc.last_column;
+  yylloc.first_column = yylloc.last_column + 1;
   int length = std::max(lexeme.length() - 1, (std::size_t)1);
   yylloc.last_column = yylloc.first_column + length;
 }
