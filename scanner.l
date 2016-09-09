@@ -72,6 +72,10 @@ HEXADECIMAL 0[xX]{HEX_SUFFIX}
 
 DECIMAL {DIGIT}+
 
+EXPONENT [eE]"+"{DECIMAL}
+DOUBLE_MANTISSA "."{DIGIT}+
+DOUBLE {DECIMAL}{DOUBLE_MANTISSA}{EXPONENT}?
+
 TRUE "true"
 FALSE "false"
 
@@ -124,6 +128,11 @@ OR "||"
 {DECIMAL} {
   yylval.integerConstant = std::stoi(yytext);
   return T_IntConstant;
+}
+
+{DOUBLE} {
+  yylval.doubleConstant = std::stod(yytext);
+  return T_DoubleConstant;
 }
 
 {LESS_EQUAL} return T_LessEqual;
