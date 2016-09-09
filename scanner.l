@@ -35,6 +35,7 @@
    * just scanned to the client. (Operates similarly to yylval above)
    */
   struct yyltype yylloc; // manually dclared for pp1, later Yacc provides
+  int yycolumn = 1;
 
   /* Macro: YY_USER_ACTION 
    * ---------------------
@@ -126,10 +127,9 @@ OR "||"
   */ 
 
 {SPACE_TAB} {}
-
 {ENDL} {
-  ++yylloc.first_line;
-  yylloc.first_column = yylloc.last_column = 1;
+  yycolumn = 1;
+  ++yylineno;
 }
 
 {KEY_VOID} return T_Void;
@@ -240,8 +240,8 @@ void InitScanner()
  */
 static void DoBeforeEachAction()
 {
-  std::string lexeme(yytext);
-  yylloc.first_column = yylloc.last_column + 1;
-  int length = std::max(lexeme.length() - 1, (std::size_t)1);
-  yylloc.last_column = yylloc.first_column + length;
+  yylloc.first_line = yylineno;
+  yylloc.first_column = yycolumn;
+  yylloc.last_column = yycolumn + yyleng - 1;
+  yycolumn += yyleng;
 }
