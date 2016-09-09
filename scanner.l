@@ -62,6 +62,27 @@
 
 SPACE_TAB [ \t]
 ENDL \n
+
+KEY_VOID "void"
+KEY_INT "int"
+KEY_DOUBLE "double"
+KEY_BOOL "bool"
+KEY_STRING "string"
+KEY_CLASS "class"
+KEY_INTERFACE "interface"
+KEY_NULL "null"
+KEY_THIS "this"
+KEY_EXTENDS "extends"
+KEY_IMPLEMENTS "implements"
+KEY_FOR "for"
+KEY_WHILE "while"
+KEY_IF "if"
+KEY_ELSE "else"
+KEY_RETURN "return"
+KEY_BREAK "break"
+KEY_NEW "New"
+KEY_NEW_ARRAY "NewArray"
+
 IDENTIFIER [:alpha:][[:alnum:]_]*
 DIGIT [0-9]
 
@@ -103,6 +124,27 @@ OR "||"
   ++yylloc.first_line;
   yylloc.first_column = yylloc.last_column = 1;
 }
+
+{KEY_VOID} return T_Void;
+{KEY_INT} return T_Int;
+{KEY_DOUBLE} return T_Double;
+{KEY_BOOL} return T_Bool;
+{KEY_STRING} return T_String;
+{KEY_CLASS} return T_Class;
+{KEY_INTERFACE} return T_Interface;
+{KEY_NULL} return T_Null;
+{KEY_THIS} return T_This;
+{KEY_EXTENDS} return T_Extends;
+{KEY_IMPLEMENTS} return T_Implements;
+{KEY_FOR} return T_For;
+{KEY_WHILE} return T_While;
+{KEY_IF} return T_If;
+{KEY_ELSE} return T_Else;
+{KEY_RETURN} return T_Return;
+{KEY_BREAK} return T_Break;
+{KEY_NEW} return T_New;
+{KEY_NEW_ARRAY} return T_NewArray;
+
 
 {IDENTIFIER} {
   std::string lexeme(yytext);
