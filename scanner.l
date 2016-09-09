@@ -64,6 +64,15 @@ TAB \t
 ENDL \n
 IDENTIFIER [:alpha:][[:alnum:]_]*
 
+PUNCTUATION_1 [\+\-\*/%<>=!;,\.\[\]\(\)\{\}]
+
+LESS_EQUAL "<="
+GREATER_EQUAL ">="
+EQUAL "=="
+NOT_EQUAL "!="
+AND "&&"
+OR "||"
+
 %%						 /* BEGIN RULES SECTION */
  /* All patterns and actions should be placed between the start and stop
   * %% markers which delimit the Rules section. 
@@ -89,6 +98,15 @@ IDENTIFIER [:alpha:][[:alnum:]_]*
   yylval.identifier[MaxIdentLen] = '\0';
   return T_Identifier;
 }
+
+{LESS_EQUAL} return T_LessEqual;
+{GREATER_EQUAL} return T_GreaterEqual;
+{EQUAL} return T_Equal;
+{NOT_EQUAL} return T_NotEqual;
+{AND} return T_And;
+{OR} return T_Or;
+
+{PUNCTUATION_1} return yytext[0];
 
 . {}
 
