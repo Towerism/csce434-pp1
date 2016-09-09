@@ -35,7 +35,13 @@
    * just scanned to the client. (Operates similarly to yylval above)
    */
   struct yyltype yylloc; // manually dclared for pp1, later Yacc provides
-  int yycolumn = 1;
+
+  /* Global variable: yycolumn
+   * -----------------------
+   * This global variable is how we get position information about the token
+   * just scanned to the client. (outside of yylloc)
+   */
+  int yycolumn; // manually dclared for pp1, later Yacc provides
 
   /* Macro: YY_USER_ACTION 
    * ---------------------
@@ -228,7 +234,7 @@ OR "||"
 void InitScanner()
 {
   PrintDebug("lex", "Initializing scanner");
-  yylloc.first_line = yylloc.first_column = yylloc.last_column = 1;
+  yycolumn = yylloc.first_line = yylloc.first_column = yylloc.last_column = 1;
   yy_flex_debug = false;
 }
 

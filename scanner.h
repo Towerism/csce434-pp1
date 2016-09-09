@@ -72,6 +72,10 @@ extern YYSTYPE yylval;
 
 extern char *yytext;      // Text of lexeme just scanned
 
+extern int yyleng; // Length of lexeme just scanned
+
+extern int yycolumn; // will use to keep track of column outside of yylloc
+
 
 extern "C" int yylex();              // Defined in the generated lex.yy.c file
 void yyrestart(FILE *fp); // ditto
