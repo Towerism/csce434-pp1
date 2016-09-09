@@ -12,6 +12,7 @@
    * or C++ variable declarations/prototypes that are needed by your code here.
    */
 
+#include <algorithm>
 #include <string.h>
 #include <string>
 #include "scanner.h"
@@ -59,10 +60,14 @@
 */
 %option noyywrap
 
-SPACE [ ]
-TAB \t
+SPACE_TAB [ \t]
 ENDL \n
 IDENTIFIER [:alpha:][[:alnum:]_]*
+DIGIT [0-9]
+INTEGER {DIGIT}+
+
+TRUE "true"
+FALSE "false"
 
 PUNCTUATION_1 [\+\-\*/%<>=!;,\.\[\]\(\)\{\}]
 
@@ -78,18 +83,14 @@ OR "||"
   * %% markers which delimit the Rules section. 
   */ 
 
-{SPACE} {
-  ++yylloc.last_column;
-}
-
-\t+ {}
+{SPACE_TAB} {}
 
 {ENDL} {
   ++yylloc.first_line;
   yylloc.first_column = yylloc.last_column = 1;
 }
 
-{IDENTIFIER}+ {
+{IDENTIFIER} {
   std::string lexeme(yytext);
   if (lexeme.length() > MaxIdentLen) {
     ReportError::LongIdentifier(&yylloc, yytext);
@@ -97,6 +98,21 @@ OR "||"
   strncpy(yylval.identifier, yytext, MaxIdentLen);
   yylval.identifier[MaxIdentLen] = '\0';
   return T_Identifier;
+}
+
+{TRUE} {
+  yylval.boolConstant = true;
+  return T_Bool;
+}
+
+{FALSE} {
+  yylval.boolConstant = false;
+  return T_Bool;
+}
+
+{INTEGER} {
+  yylval.integerConstant = std::stoi(yytext);
+  return T_IntConstant;
 }
 
 {LESS_EQUAL} return T_LessEqual;
@@ -134,7 +150,7 @@ void InitScanner()
 {
   PrintDebug("lex", "Initializing scanner");
   yylloc.first_line = yylloc.first_column = yylloc.last_column = 1;
-  yy_flex_debug = false;
+  yy_flex_debug = true;
 }
 
 
@@ -147,5 +163,6 @@ static void DoBeforeEachAction()
 {
   std::string lexeme(yytext);
   yylloc.first_column = yylloc.last_column;
-  yylloc.last_column = yylloc.first_column + lexeme.length();
+  int length = std::max(lexeme.length() - 1, (std::size_t)1);
+  yylloc.last_column = yylloc.first_column + length;
 }
