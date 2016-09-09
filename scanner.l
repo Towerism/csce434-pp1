@@ -154,12 +154,12 @@ OR "||"
 
 {TRUE} {
   yylval.boolConstant = true;
-  return T_Bool;
+  return T_BoolConstant;
 }
 
 {FALSE} {
   yylval.boolConstant = false;
-  return T_Bool;
+  return T_BoolConstant;
 }
 
 {IDENTIFIER} {
