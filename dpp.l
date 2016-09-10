@@ -11,7 +11,6 @@
 #include <iostream>
 #include <regex>
 #include <string>
-#include <sstream>
 #include <unordered_map>
 #include "scanner.h"
 #include "errors.h"
@@ -45,30 +44,22 @@ SUBSTITUTION .*
 
 BEGIN_DEFINITION "#define"
 DEFINITION {BEGIN_DEFINITION}" "{SUBSTITUTION_NAME}" "{SUBSTITUTION}
-BAD_DEFINITION #[dD][eE][fF][iI][nN][eE]" "?[a-zA-Z0-9]+" "?{SUBSTITUTION}
+BAD_DEFINITION #[dD][eE][fF][iI][nN][eE]" "*[a-zA-Z0-9]+" "*{SUBSTITUTION}
 
 REPLACEMENT #{SUBSTITUTION_NAME}
 BAD_REPLACEMENT #[a-zA-Z0-9]+
 
-ALPHA_NUM [a-zA-Z0-9]
-BEGIN_CATCHALL_DIRECTIVE [{BEGIN_DEFINITION}{SUBSTITUTION_NAME}{ALPHA_NUM}]
-CATCHALL_DIRECTIVE_NAME [{SUBSTITUTION_NAME}{ALPHA_NUM}]
-CATCHALL_DIRECTIVE "#"{BEGIN_CATCHALL_DIRECTIVE}" "?{CATCHALL_DIRECTIVE_NAME}" "?{SUBSTITUTION}?
-
 SINGLE_LINE_COMMENT "//".*
 BEGIN_MULTI_COMMENT "/*"
 END_MULTI_COMMENT "*/"
-LINE {NOT_ENDL}*{ENDL}
-
 
 %%
-
-<INITIAL>{SINGLE_LINE_COMMENT} {}
 
 <*>{ENDL} {
   ++yylineno;
   returnText(yytext);
 };
+
 {SPACE_TAB} returnText(yytext);
 
 {STRING} returnText(yytext);
@@ -81,9 +72,7 @@ LINE {NOT_ENDL}*{ENDL}
   substitute_map[key] = cm[2];
 }
 
-{BAD_DEFINITION} {
-  ReportError::InvalidDirective(yylineno);
-}
+{BAD_DEFINITION} ReportError::InvalidDirective(yylineno);
 
 {REPLACEMENT} {
   std::regex replace("#([A-Z]+)");
@@ -96,18 +85,15 @@ LINE {NOT_ENDL}*{ENDL}
   std::cout << substitute_map[key];
 }
 
-{BAD_REPLACEMENT} {
-  ReportError::InvalidDirective(yylineno);
-}
+{BAD_REPLACEMENT} ReportError::InvalidDirective(yylineno);
 
+<INITIAL>{SINGLE_LINE_COMMENT} {}
 <INITIAL>{BEGIN_MULTI_COMMENT} beginComment();
 <COMMENT>{END_MULTI_COMMENT} beginInitial();
 <COMMENT>{NOT_WHITESPACE} {}
-<COMMENT><<EOF>> {ReportError::UntermComment(); return 0; }
+<COMMENT><<EOF>> ReportError::UntermComment();
 
-{NOT_WHITESPACE} {
-  returnText(yytext);
-}
+{NOT_WHITESPACE} returnText(yytext);
 
 %%
 
