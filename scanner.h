@@ -8,6 +8,7 @@
 #ifndef _H_scanner
 #define _H_scanner
 
+#include <sstream>
 #include <stdio.h>
 
 #define MaxIdentLen 31    // Maximum length for identifiers
@@ -23,9 +24,7 @@
  */
 typedef enum { 
     T_Void = 256,
-    T_Int, T_Double, T_Bool, T_String, T_Class, T_Null, 
-    T_LessEqual, T_GreaterEqual, T_Equal, T_NotEqual, T_And, T_Or,
-    T_While, T_For, T_If, T_Else, T_Return, T_Break,
+    T_Int, T_Double, T_Bool, T_String, T_Class, T_Null, T_LessEqual, T_GreaterEqual, T_Equal, T_NotEqual, T_And, T_Or, T_While, T_For, T_If, T_Else, T_Return, T_Break,
     T_Extends, T_This, T_Implements, T_Interface, T_New, T_NewArray,
     T_Identifier, T_StringConstant, T_IntConstant, T_DoubleConstant,
     T_BoolConstant,
@@ -80,7 +79,7 @@ extern int yycolumn; // will use to keep track of column outside of yylloc
 extern "C" int yylex();              // Defined in the generated lex.yy.c file
 void yyrestart(FILE *fp); // ditto
 
-
 void InitScanner();                 // Defined in scanner.l user subroutines
+void InitPreprocessor();            // Defined in dpp.l user subroutines
  
 #endif

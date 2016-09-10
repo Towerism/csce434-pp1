@@ -18,8 +18,7 @@
  */
 int main(int argc, char *argv[])
 {
-  InitScanner();
+  InitPreprocessor();
   yylex();
-
   return 0;
 }

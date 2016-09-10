@@ -101,4 +101,3 @@ test: $(COMPILER)
 errors.o: errors.h location.h
 utility.o: utility.h list.h
 main.o: utility.h errors.h location.h scanner.h
-
