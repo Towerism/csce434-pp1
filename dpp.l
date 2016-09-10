@@ -17,6 +17,8 @@
 
   static void returnText(char* text);
   static void beginComment();
+  static std::cmatch regexMatch(char* s, std::string expression);
+  static void invalidDirectiveIfKeyIsInvalid(std::string key);
   static void beginBadDirective();
   static void beginInitial();
   static void returnEndl();
@@ -72,23 +74,17 @@ END_MULTI_COMMENT "*/"
 {STRING} returnText(yytext);
 
 {DEFINITION} {
-  std::regex define("#define[ ]([A-Z]+)\[ ]([^\n]*)");
-  std::cmatch cm;
-  std::regex_match(yytext, cm, define);
-  std::string key(cm[1]);
-  substitute_map[key] = cm[2];
+  std::cmatch match = regexMatch(yytext, "#define[ ]([A-Z]+)\[ ]([^\n]*)");
+  std::string key(match[1]);
+  substitute_map[key] = match[2];
 }
 
 {BAD_DEFINITION} beginBadDirective();
 
 {REPLACEMENT} {
-  std::regex replace("#([A-Z]+)");
-  std::cmatch cm;
-  std::regex_match(yytext, cm, replace);
-  std::string key(cm[1]);
-  auto replacement = substitute_map.find(key);
-  if (replacement == substitute_map.end())
-    ReportError::InvalidDirective(yylineno);
+  std::cmatch match = regexMatch(yytext, "#([A-Z]+)");
+  std::string key(match[1]);
+  invalidDirectiveIfKeyIsInvalid(key);
   std::cout << substitute_map[key];
 }
 
@@ -115,6 +111,19 @@ void InitPreprocessor() {
 
 void returnText(char* text) {
   std::cout << text;
+}
+
+std::cmatch regexMatch(char* s, std::string expression) {
+  std::regex e(expression);
+  std::cmatch cm;
+  std::regex_match(s, cm, e);
+  return cm;
+}
+
+void invalidDirectiveIfKeyIsInvalid(std::string key) {
+  auto replacement = substitute_map.find(key);
+  if (replacement == substitute_map.end())
+    ReportError::InvalidDirective(yylineno);
 }
 
 void beginComment() {
