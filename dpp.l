@@ -17,7 +17,9 @@
 
   static void returnText(char* text);
   static void beginComment();
+  static void beginBadDirective();
   static void beginInitial();
+  static void returnEndl();
 
   std::unordered_map<std::string, std::string> substitute_map;
 
@@ -25,6 +27,7 @@
 %}
 
 %s COMMENT
+%s BAD_DIRECTIVE
 
 %option noyywrap
 
@@ -44,10 +47,10 @@ SUBSTITUTION .*
 
 BEGIN_DEFINITION "#define"
 DEFINITION {BEGIN_DEFINITION}" "{SUBSTITUTION_NAME}" "{SUBSTITUTION}
-BAD_DEFINITION #[dD][eE][fF][iI][nN][eE]" "*[a-zA-Z0-9]+" "*{SUBSTITUTION}
+BAD_DEFINITION #[dD][eE][fF][iI][nN][eE]+" "*[a-zA-Z0-9]+" "*{SUBSTITUTION}
 
 REPLACEMENT #{SUBSTITUTION_NAME}
-BAD_REPLACEMENT #[a-zA-Z0-9]+
+BAD_REPLACEMENT #[a-zA-Z0-9]*
 
 SINGLE_LINE_COMMENT "//".*
 BEGIN_MULTI_COMMENT "/*"
@@ -55,10 +58,14 @@ END_MULTI_COMMENT "*/"
 
 %%
 
-<*>{ENDL} {
-  ++yylineno;
-  returnText(yytext);
-};
+<BAD_DIRECTIVE>{ENDL} {
+  beginInitial();
+  returnEndl();
+}
+
+<BAD_DIRECTIVE>{NOT_ENDL}* {}
+
+<*>{ENDL} returnEndl();
 
 {SPACE_TAB} returnText(yytext);
 
@@ -72,7 +79,7 @@ END_MULTI_COMMENT "*/"
   substitute_map[key] = cm[2];
 }
 
-{BAD_DEFINITION} ReportError::InvalidDirective(yylineno);
+{BAD_DEFINITION} beginBadDirective();
 
 {REPLACEMENT} {
   std::regex replace("#([A-Z]+)");
@@ -85,7 +92,7 @@ END_MULTI_COMMENT "*/"
   std::cout << substitute_map[key];
 }
 
-{BAD_REPLACEMENT} ReportError::InvalidDirective(yylineno);
+{BAD_REPLACEMENT} beginBadDirective();
 
 <INITIAL>{SINGLE_LINE_COMMENT} {}
 <INITIAL>{BEGIN_MULTI_COMMENT} beginComment();
@@ -114,6 +121,16 @@ void beginComment() {
   BEGIN(COMMENT);
 }
 
+void beginBadDirective() {
+  ReportError::InvalidDirective(yylineno);
+  BEGIN(BAD_DIRECTIVE);
+}
+
 void beginInitial() {
   BEGIN(INITIAL);
+}
+
+void returnEndl() {
+  ++yylineno;
+  returnText(yytext);
 }
