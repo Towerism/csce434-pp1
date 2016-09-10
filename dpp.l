@@ -18,7 +18,7 @@
   static void returnText(char* text);
   static void beginComment();
   static std::cmatch regexMatch(char* s, std::string expression);
-  static void invalidDirectiveIfKeyIsInvalid(std::string key);
+  static bool replacementKeyIsInvalid(std::string key);
   static void beginBadDirective();
   static void beginInitial();
   static void returnEndl();
@@ -84,11 +84,15 @@ END_MULTI_COMMENT "*/"
 {REPLACEMENT} {
   std::cmatch match = regexMatch(yytext, "#([A-Z]+)");
   std::string key(match[1]);
-  invalidDirectiveIfKeyIsInvalid(key);
-  std::cout << substitute_map[key];
+  if (replacementKeyIsInvalid(key)) {
+    ReportError::InvalidDirective(yylineno);
+  } else {
+    std::cout << substitute_map[key];
+  }
 }
 
 {BAD_REPLACEMENT} beginBadDirective();
+
 
 <INITIAL>{SINGLE_LINE_COMMENT} {}
 <INITIAL>{BEGIN_MULTI_COMMENT} beginComment();
@@ -120,10 +124,9 @@ std::cmatch regexMatch(char* s, std::string expression) {
   return cm;
 }
 
-void invalidDirectiveIfKeyIsInvalid(std::string key) {
+bool replacementKeyIsInvalid(std::string key) {
   auto replacement = substitute_map.find(key);
-  if (replacement == substitute_map.end())
-    ReportError::InvalidDirective(yylineno);
+  return replacement == substitute_map.end();
 }
 
 void beginComment() {
