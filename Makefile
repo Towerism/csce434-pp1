@@ -44,7 +44,7 @@ LEXFLAGS = -d
 YACCFLAGS = -dvty
 
 # Link with standard c library, math library, and lex library
-LIBS = -lc -lm 
+LIBS = -lc -lm -lboost_regex
 
 # Rules for various parts of the target
 

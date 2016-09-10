@@ -9,7 +9,7 @@
 %{
 #include <string.h>
 #include <iostream>
-#include <regex>
+#include <boost/regex.hpp>
 #include <string>
 #include <unordered_map>
 #include "scanner.h"
@@ -17,7 +17,7 @@
 
   static void returnText(char* text);
   static void beginComment();
-  static std::cmatch regexMatch(char* s, std::string expression);
+  static boost::cmatch regexMatch(char* s, std::string expression);
   static bool replacementKeyIsInvalid(std::string key);
   static void beginBadDirective();
   static void beginInitial();
@@ -73,9 +73,9 @@ END_MULTI_COMMENT "*/"
 {STRING} returnText(yytext);
 
 {DEFINITION} {
-  std::regex define("#define[ ]([A-Z]+)\[ ]([^\n]*)");
-  std::cmatch match;
-  if (!std::regex_match(yytext, match, define)) {
+  boost::regex define("#define\\ ([A-Z]+)\\ ([^\n]*)");
+  boost::cmatch match;
+  if (!boost::regex_match(yytext, match, define)) {
     ReportError::InvalidDirective(yylineno);
   } else {
     std::string key(match[1]);
@@ -84,7 +84,7 @@ END_MULTI_COMMENT "*/"
 }
 
 {REPLACEMENT} {
-  std::cmatch match = regexMatch(yytext, "#([A-Z]+)");
+  boost::cmatch match = regexMatch(yytext, "#([A-Z]+)");
   std::string key(match[1]);
   if (replacementKeyIsInvalid(key)) {
     ReportError::InvalidDirective(yylineno);
@@ -119,10 +119,10 @@ void returnText(char* text) {
   std::cout << text;
 }
 
-std::cmatch regexMatch(char* s, std::string expression) {
-  std::regex e(expression);
-  std::cmatch cm;
-  std::regex_match(s, cm, e);
+boost::cmatch regexMatch(char* s, std::string expression) {
+  boost::regex e(expression);
+  boost::cmatch cm;
+  boost::regex_match(s, cm, e);
   return cm;
 }
 
