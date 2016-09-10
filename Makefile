@@ -8,7 +8,7 @@
 # Set the default target. When you make with no arguments,
 # this will be the target built.
 COMPILER = dcc
-PREPROCESSOR =
+PREPROCESSOR = dpp
 PRODUCTS = $(COMPILER) $(PREPROCESSOR)
 default: $(PRODUCTS)
 
@@ -72,7 +72,7 @@ $(PREPROCESSOR) : $(PREP_OBJS)
 	$(LD) -o $@ $(PREP_OBJS) $(LIBS)
 
 dpp.yy.c : dpp.l
-	$(LEX) -odpp.yy.c dpp.l
+	$(LEX) $(LEXFLAGS) -odpp.yy.c dpp.l
 
 # This target is to build small for testing (no debugging info), removes
 # all intermediate products, too

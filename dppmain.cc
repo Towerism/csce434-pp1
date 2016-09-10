@@ -5,7 +5,6 @@
  */
  
 #include "scanner.h"
-#include <stdio.h>
 
 /* Function: main()
  * ----------------
@@ -19,8 +18,8 @@
  */
 int main(int argc, char *argv[])
 {
-  int ch;
-  while ((ch = getc(stdin)) != EOF)
-    putc(ch, stdout);
+  InitScanner();
+  yylex();
+
   return 0;
 }
