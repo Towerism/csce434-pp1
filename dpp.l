@@ -48,8 +48,7 @@ SUBSTITUTION_NAME {UPCASE}+
 SUBSTITUTION .*
 
 BEGIN_DEFINITION "#define"
-DEFINITION {BEGIN_DEFINITION}" "{SUBSTITUTION_NAME}" "{SUBSTITUTION}
-BAD_DEFINITION #[dD][eE][fF][iI][nN][eE]+" "*[a-zA-Z0-9]+" "*{SUBSTITUTION}
+DEFINITION {BEGIN_DEFINITION}.*
 
 REPLACEMENT #{SUBSTITUTION_NAME}
 BAD_REPLACEMENT #[a-zA-Z0-9]*
@@ -74,12 +73,15 @@ END_MULTI_COMMENT "*/"
 {STRING} returnText(yytext);
 
 {DEFINITION} {
-  std::cmatch match = regexMatch(yytext, "#define[ ]([A-Z]+)\[ ]([^\n]*)");
-  std::string key(match[1]);
-  substitute_map[key] = match[2];
+  std::regex define("#define[ ]([A-Z]+)\[ ]([^\n]*)");
+  std::cmatch match;
+  if (!std::regex_match(yytext, match, define)) {
+    ReportError::InvalidDirective(yylineno);
+  } else {
+    std::string key(match[1]);
+    substitute_map[key] = match[2];
+  }
 }
-
-{BAD_DEFINITION} beginBadDirective();
 
 {REPLACEMENT} {
   std::cmatch match = regexMatch(yytext, "#([A-Z]+)");
@@ -109,7 +111,7 @@ END_MULTI_COMMENT "*/"
 
 void InitPreprocessor() {
   yylineno = 1;
-  yy_flex_debug = false;
+  yy_flex_debug = true;
   BEGIN(INITIAL);
 }
 
