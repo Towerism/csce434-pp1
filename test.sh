@@ -1,4 +1,4 @@
-#!/bin/env sh
+#!/bin/sh
 
 SAMPLEIN=$(find . -name '*.frag' -o \( -name '*.decaf' \))
 
