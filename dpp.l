@@ -111,7 +111,7 @@ END_MULTI_COMMENT "*/"
 
 void InitPreprocessor() {
   yylineno = 1;
-  yy_flex_debug = true;
+  yy_flex_debug = false;
   BEGIN(INITIAL);
 }
 
