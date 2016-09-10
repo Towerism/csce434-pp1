@@ -91,7 +91,10 @@ END_MULTI_COMMENT "*/"
 <INITIAL>{BEGIN_MULTI_COMMENT} beginComment();
 <COMMENT>{END_MULTI_COMMENT} beginInitial();
 <COMMENT>{NOT_WHITESPACE} {}
-<COMMENT><<EOF>> ReportError::UntermComment();
+<COMMENT><<EOF>> {
+  ReportError::UntermComment();
+  return 0;
+}
 
 {NOT_WHITESPACE} returnText(yytext);
 
