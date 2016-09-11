@@ -73,26 +73,6 @@ SPACE " "
 TAB "\t"
 ENDL \n
 
-KEY_VOID "void"
-KEY_INT "int"
-KEY_DOUBLE "double"
-KEY_BOOL "bool"
-KEY_STRING "string"
-KEY_CLASS "class"
-KEY_INTERFACE "interface"
-KEY_NULL "null"
-KEY_THIS "this"
-KEY_EXTENDS "extends"
-KEY_IMPLEMENTS "implements"
-KEY_FOR "for"
-KEY_WHILE "while"
-KEY_IF "if"
-KEY_ELSE "else"
-KEY_RETURN "return"
-KEY_BREAK "break"
-KEY_NEW "New"
-KEY_NEW_ARRAY "NewArray"
-
 LOWER [a-z]
 UPPER [A-Z]
 ALPHA {LOWER}|{UPPER}
@@ -147,25 +127,25 @@ OR "||"
   ++yylineno;
 }
 
-{KEY_VOID} return T_Void;
-{KEY_INT} return T_Int;
-{KEY_DOUBLE} return T_Double;
-{KEY_BOOL} return T_Bool;
-{KEY_STRING} return T_String;
-{KEY_CLASS} return T_Class;
-{KEY_INTERFACE} return T_Interface;
-{KEY_NULL} return T_Null;
-{KEY_THIS} return T_This;
-{KEY_EXTENDS} return T_Extends;
-{KEY_IMPLEMENTS} return T_Implements;
-{KEY_FOR} return T_For;
-{KEY_WHILE} return T_While;
-{KEY_IF} return T_If;
-{KEY_ELSE} return T_Else;
-{KEY_RETURN} return T_Return;
-{KEY_BREAK} return T_Break;
-{KEY_NEW} return T_New;
-{KEY_NEW_ARRAY} return T_NewArray;
+"void" return T_Void;
+"int" return T_Int;
+"double" return T_Double;
+"bool" return T_Bool;
+"string" return T_String;
+"class" return T_Class;
+"interface" return T_Interface;
+"null" return T_Null;
+"this" return T_This;
+"extends" return T_Extends;
+"implements" return T_Implements;
+"for" return T_For;
+"while" return T_While;
+"if" return T_If;
+"else" return T_Else;
+"return" return T_Return;
+"break" return T_Break;
+"New" return T_New;
+"NewArray" return T_NewArray;
 
 {TRUE} {
   yylval.boolConstant = true;
