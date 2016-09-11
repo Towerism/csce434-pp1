@@ -20,7 +20,7 @@
   static boost::cmatch regexMatch(char* s, std::string expression);
   static bool replacementKeyIsInvalid(std::string key);
   static void beginBadDirective();
-  static void beginInitial();
+  static void leaveState();
   static void returnEndl();
 
   std::unordered_map<std::string, std::string> substitute_map;
@@ -32,6 +32,7 @@
 %s BAD_DIRECTIVE
 
 %option noyywrap
+%option stack
 
 SPACE_TAB [ \t]
 ENDL \n
@@ -60,7 +61,7 @@ END_MULTI_COMMENT "*/"
 %%
 
 <BAD_DIRECTIVE>{ENDL} {
-  beginInitial();
+  leaveState();
   returnEndl();
 }
 
@@ -98,10 +99,11 @@ END_MULTI_COMMENT "*/"
 
 <INITIAL>{SINGLE_LINE_COMMENT} {}
 <INITIAL>{BEGIN_MULTI_COMMENT} beginComment();
-<COMMENT>{END_MULTI_COMMENT} beginInitial();
+<COMMENT>{END_MULTI_COMMENT} leaveState();
 <COMMENT>{NOT_WHITESPACE} {}
 <COMMENT><<EOF>> {
   ReportError::UntermComment();
+  leaveState();
   return 0;
 }
 
@@ -132,16 +134,16 @@ bool replacementKeyIsInvalid(std::string key) {
 }
 
 void beginComment() {
-  BEGIN(COMMENT);
+  yy_push_state(COMMENT);
 }
 
 void beginBadDirective() {
   ReportError::InvalidDirective(yylineno);
-  BEGIN(BAD_DIRECTIVE);
+  yy_push_state(BAD_DIRECTIVE);
 }
 
-void beginInitial() {
-  BEGIN(INITIAL);
+void leaveState() {
+  yy_pop_state();
 }
 
 void returnEndl() {
