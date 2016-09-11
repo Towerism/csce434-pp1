@@ -19,6 +19,8 @@
 #include "utility.h" // for PrintDebug()
 #include "errors.h"
 
+#define TAB_SIZE 8
+
   /* Global variable: yylval
    * -----------------------
    * This global variable is how we get attribute information about the token
@@ -67,7 +69,8 @@
 */
 %option noyywrap
 
-SPACE_TAB [ \t]
+SPACE " "
+TAB "\t"
 ENDL \n
 
 KEY_VOID "void"
@@ -133,7 +136,12 @@ OR "||"
   * %% markers which delimit the Rules section. 
   */ 
 
-{SPACE_TAB} {}
+{SPACE} {}
+
+{TAB} {
+  yycolumn += TAB_SIZE - yycolumn % TAB_SIZE + 1;
+}
+
 {ENDL} {
   yycolumn = 1;
   ++yylineno;
