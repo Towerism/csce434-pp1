@@ -101,6 +101,7 @@ DOUBLE {DECIMAL}{DOUBLE_MANTISSA}{EXPONENT}?
 
 TRUE "true"
 FALSE "false"
+BOOLEAN {TRUE}|{FALSE}
 
 PUNCTUATION_1 [\+\-\*/%<>=!;,\.\[\]\(\)\{\}]
 
@@ -140,13 +141,9 @@ PUNCTUATION_1 [\+\-\*/%<>=!;,\.\[\]\(\)\{\}]
 "New" return T_New;
 "NewArray" return T_NewArray;
 
-{TRUE} {
-  yylval.boolConstant = true;
-  return T_BoolConstant;
-}
-
-{FALSE} {
-  yylval.boolConstant = false;
+{BOOLEAN} {
+  bool value = yytext[0] == 't';
+  yylval.boolConstant = value;
   return T_BoolConstant;
 }
 
