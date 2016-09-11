@@ -190,7 +190,7 @@ OR "||"
 {UNTERMINATED_STRING} ReportError::UntermString(&yylloc, yytext);
 
 {STRING} {
-  yylval.stringConstant = yytext;
+  yylval.stringConstant = strdup(yytext);
   return T_StringConstant;
 }
 
