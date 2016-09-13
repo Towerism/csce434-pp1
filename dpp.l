@@ -15,11 +15,11 @@
 #include "scanner.h"
 #include "errors.h"
 
-  static void returnText(char* text);
+  static void returnText(const char* text);
   static void beginComment();
   static boost::cmatch regexMatch(char* s, std::string expression);
   static bool replacementKeyIsInvalid(std::string key);
-  static void beginBadDirective();
+  static void beginBadDirective(bool discardLine = false);
   static void leaveState();
   static void returnEndl();
 
@@ -78,7 +78,7 @@ END_MULTI_COMMENT "*/"
   boost::regex define("#define\\ ([A-Z]+)\\ ([^\n]*)");
   boost::cmatch match;
   if (!boost::regex_match(yytext, match, define)) {
-    ReportError::InvalidDirective(yylineno);
+    beginBadDirective(true);
   } else {
     std::string key(match[1]);
     substitute_map[key] = match[2];
@@ -89,7 +89,7 @@ END_MULTI_COMMENT "*/"
   boost::cmatch match = regexMatch(yytext, "#([A-Z]+)");
   std::string key(match[1]);
   if (replacementKeyIsInvalid(key)) {
-    ReportError::InvalidDirective(yylineno);
+    beginBadDirective();
   } else {
     std::cout << substitute_map[key];
   }
@@ -118,7 +118,7 @@ void InitPreprocessor() {
   BEGIN(INITIAL);
 }
 
-void returnText(char* text) {
+void returnText(const char* text) {
   std::cout << text;
 }
 
@@ -138,9 +138,12 @@ void beginComment() {
   yy_push_state(COMMENT);
 }
 
-void beginBadDirective() {
+void beginBadDirective(bool discardLine) {
   ReportError::InvalidDirective(yylineno);
-  yy_push_state(BAD_DIRECTIVE);
+  if (discardLine)
+    yy_push_state(BAD_DIRECTIVE);
+  else
+    returnText(std::string(yyleng, ' ').c_str());
 }
 
 void leaveState() {
