@@ -27,3 +27,8 @@ When a replacement directive is ill-formed, i.e. the replacement key doesn't
 exist in the hash table, I decided to pass a number of spaces equal to the
 length of the ill-formed directive to the scanner so the columns kept track of
 by the scanner would not surprise the user when the directive token is discarded.
+
+### Tab characters
+I decided to increment the column tracker by 8 when a tab character is
+encountered. If the user wants to use their own "tab" size, they should instead
+use spaces instead of redefining tab size in their text editor.
