@@ -21,3 +21,9 @@ To avoid complicated manipulation of the lex state stack, I decided to have lex
 match any directive that begins with `#define `. Then inside the lex rule I use
 `boost::regex_match` to determine if the define directive is well formed whilst
 simultaneously capturing the key and value for the replacement hash table.
+
+### Ill-formed Replacement Directive
+When a replacement directive is ill-formed, i.e. the replacement key doesn't
+exist in the hash table, I decided to pass a number of spaces equal to the
+length of the ill-formed directive to the scanner so the columns kept track of
+by the scanner would not surprise the user when the directive token is discarded.
