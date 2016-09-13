@@ -73,8 +73,9 @@ extern char *yytext;      // Text of lexeme just scanned
 
 extern int yyleng; // Length of lexeme just scanned
 
-extern int yycolumn; // will use to keep track of column outside of yylloc
+extern int yylineno; // flex provides this to keep track of line number
 
+extern int yycolumn; // used to keep track of column number
 
 extern "C" int yylex();              // Defined in the generated lex.yy.c file
 void yyrestart(FILE *fp); // ditto
