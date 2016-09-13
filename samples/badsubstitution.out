@@ -6,4 +6,6 @@
 *** Error line 2.
 *** Invalid # directive
 
-asdf         line 1 cols 2-5 is T_Identifier 
+asdf         line 1 cols 7-10 is T_Identifier 
+SDf          line 2 cols 3-5 is T_Identifier 
+asdf         line 2 cols 7-10 is T_Identifier 
