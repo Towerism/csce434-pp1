@@ -68,6 +68,7 @@
 * entries in the Rules section later. 
 */
 %option noyywrap
+%option yylineno
 
 SPACE " "
 TAB "\t"
@@ -116,7 +117,6 @@ PUNCTUATION_1 [\+\-\*/%<>=!;,\.\[\]\(\)\{\}]
 
 {ENDL} {
   yycolumn = 1;
-  ++yylineno;
 }
 
 "void" return T_Void;
