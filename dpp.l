@@ -49,7 +49,7 @@ SUBSTITUTION_NAME {UPCASE}+
 SUBSTITUTION .*
 
 BEGIN_DEFINITION "#define"
-DEFINITION {BEGIN_DEFINITION}.*
+DEFINITION ^{BEGIN_DEFINITION}.*
 
 ALPHA_NUM [:alnum:]
 REPLACEMENT #{SUBSTITUTION_NAME}
@@ -75,13 +75,13 @@ END_MULTI_COMMENT "*/"
 {STRING} returnText(yytext);
 
 {DEFINITION} {
-  boost::regex define("#define\\ ([A-Z]+)\\ ([^\n]*)");
+  boost::regex define("#define\\ ([A-Z]+)(\\ ([^\n]*))?");
   boost::cmatch match;
   if (!boost::regex_match(yytext, match, define)) {
     beginBadDirective(true);
   } else {
     std::string key(match[1]);
-    substitute_map[key] = match[2];
+    substitute_map[key] = match[3];
   }
 }
 
